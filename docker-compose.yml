@@ -1,0 +1,60 @@
+version: '3'
+services:
+  app:
+    #起動イメージ
+    image: node:lts
+    #環境変数
+    environment: 
+    - DEBUG=app:*
+    #WindowsでHot Reload効かない問題の解決
+    - CHOKIDAR_USEPOLLING=true
+    - WATCHPACK_POLLING=true
+    tty: true
+    #ホスト側のポート
+    ports: 
+    - '3005:3000'
+    #ネットワーク
+    networks:
+    - complaints-network
+    #ソースコード格納フォルダ
+    #ホスト側の./appをコンテナのappにマウント
+    volumes:
+    - ./app:/app
+    #起動時のカレントフォルダを指定
+    working_dir: /app
+    #起動時に実行するコマンドを指定
+    command: npm start
+  server:
+    image:  node:lts
+    environment:
+      - DEBUG=server:*
+    tty:  true
+    ports:
+      - '3010:3010'
+    volumes:
+      - ./server:/server
+    working_dir: /server
+    #ネットワーク
+    networks:
+      - complaints-network
+    # command: npm start
+  db:
+    #起動イメージ
+    image: mysql:latest
+    #ホスト側のポート 27020でポートフォワード　コンテナ内部からのアクセス
+    ports:
+      - '3306:3306'
+    volumes: 
+      - ./db:/data/db
+    environment: 
+      MYSQL_ROOT_USERNAME: kerokeRo2314
+      MYSQL_ROOT_PASSWORD: k6aAs1029
+      MYSQL_USER: Kero2314kero
+      MYSQL_PASSWORD: koa180joM
+      MYSQL_DATABASE: mysqldatabase
+      TZ: Asia/Tokyo
+    networks:
+      - complaints-network
+networks:
+  complaints-network:
+    driver: bridge
